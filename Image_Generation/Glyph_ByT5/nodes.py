@@ -467,11 +467,15 @@ class Glyph_ByT5_Checkponits_Loader():
         
         color_ann_path = os.path.join(current_dir, 'Glyph_SDXL_Scripts', 'assets', 'color_idx.json')
         
-        Glyph_SDXL_checkpoints_dir = os.path.join(current_dir, 'checkpoints', 'glyph-sdxl')
+        Glyph_SDXL_checkpoints_dir = os.path.join(folder_paths.models_dir, 'Anytext', 'glyph-sdxl')
+        if os.path.exists("/stable-diffusion-cache/models"):
+            Glyph_SDXL_checkpoints_dir = os.path.join("/stable-diffusion-cache/models", 'Anytext', 'glyph-sdxl')
         config = parse_config(os.path.join(current_dir, 'Glyph_SDXL_Scripts', 'configs', 'glyph_sdxl_albedo.py'))
         font_ann_path = os.path.join(current_dir, 'Glyph_SDXL_Scripts', 'assets', 'font_idx_512.json')
         if version: # v2 multilingual
-            Glyph_SDXL_checkpoints_dir = os.path.join(current_dir, 'checkpoints', 'glyph-sdxl_multilingual_10-lang')
+            Glyph_SDXL_checkpoints_dir = os.path.join(folder_paths.models_dir, 'Anytext', 'glyph-sdxl_multilingual_10-lang')
+            if os.path.exists("/stable-diffusion-cache/models"):
+                Glyph_SDXL_checkpoints_dir = os.path.join("/stable-diffusion-cache/models", 'Anytext', 'glyph-sdxl_multilingual_10-lang')
             config = parse_config(os.path.join(current_dir, 'Glyph_SDXL_Scripts', 'configs', 'glyph_sdxl_multilingual_albedo.py'))
             font_ann_path = os.path.join(current_dir, 'Glyph_SDXL_Scripts', 'assets', 'multilingual_10-lang_idx.json')
             
@@ -484,7 +488,10 @@ class Glyph_ByT5_Checkponits_Loader():
             if Auto_Download_Path:
                 clip_path = os.path.join(folder_paths.models_dir, "text_encoders", 'models--google--byt5-small')
                 if not os.path.exists(os.path.join(clip_path, 'pytorch_model.bin')):
-                    download_repoid_model_from_huggingface("google/byt5-small", clip_path, ignore_patterns=[".msgpack", ".h5"])
+                    if os.path.exists("/stable-diffusion-cache/models/text_encoders/byt5-small"):
+                        clip_path = "/stable-diffusion-cache/models/text_encoders/byt5-small"
+                    else:
+                        download_repoid_model_from_huggingface("google/byt5-small", clip_path, ignore_patterns=[".msgpack", ".h5"])
             else:
                 clip_path = "google/byt5-small"
         

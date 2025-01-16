@@ -177,7 +177,7 @@ class UL_AnyTextLoader:
 class UL_AnyTextInputs:
     @classmethod
     def INPUT_TYPES(self):
-        self.font_files = os.listdir(os.path.join(folder_paths.models_dir, "fonts"))
+        self.font_files = folder_paths.get_filename_list("fonts")
         return {
             "required": {
                 "font_name": (['Auto_DownLoad'] + self.font_files, {"default": "AnyText-Arial-Unicode.ttf"}),
@@ -198,7 +198,7 @@ class UL_AnyTextInputs:
     DESCRIPTION = ""
 
     def inputs(self, font_name, apply_translate, translator, translator_device, keep_translator_loaded, keep_translator_device, Auto_Download_Path, show_debug=False):
-        font_path = os.path.join(folder_paths.models_dir, "fonts", font_name)
+        font_path = folder_paths.get_full_path("fonts", font_name)
         from PIL import ImageFont
         if font_name == "Auto_DownLoad":
             font_path = os.path.join(folder_paths.models_dir, "fonts", "SourceHanSansSC-Medium.otf")
@@ -233,7 +233,7 @@ class UL_AnyTextFontImg:
     def INPUT_TYPES(self):
         return {
             "required": {
-                "font": (["None"] + os.listdir(os.path.join(folder_paths.models_dir, "fonts")), {"default": "None"}),
+                "font": (["None"] + folder_paths.get_filename_list("fonts"), {"default": "None"}),
                 "pos_mask": ("MASK", ),
                 "sort_radio": ("BOOLEAN", {"default": True, "label_on": "↔水平排序", "label_off": "↕垂直排序"}), 
                 "font_color_name": (['transparent'] + Pillow_Color_Names, {"default": "white"}),
@@ -265,7 +265,7 @@ class UL_AnyTextFontImg:
         if len(texts ) == 0:
             texts  = [' ']
         max_chars = 50
-        font_path = os.path.join(folder_paths.models_dir, "fonts", font)
+        font_path = folder_paths.get_full_path("fonts", font)
         
         if not os.path.isfile(font_path):
             raise ValueError("Invalid font path.\n无效字体路径。")
@@ -463,25 +463,37 @@ class UL_AnyTextEncoder:
             if translator == 'utrobinmv/t5_translate_en_ru_zh_small_1024':
                 base_path = os.path.join(folder_paths.models_dir, "prompt_generator", "models--utrobinmv--t5_translate_en_ru_zh_small_1024")
                 if Auto_Download_Path and not os.path.exists(os.path.join(base_path, "model.safetensors")):
-                    download_repoid_model_from_huggingface(repo_id=translator, Base_Path=base_path)
+                    if os.path.exists("/stable-diffusion-cache/models/prompt_generator/t5_translate_en_ru_zh_small_1024"):
+                        base_path = "/stable-diffusion-cache/models/prompt_generator/t5_translate_en_ru_zh_small_1024"
+                    else:
+                        download_repoid_model_from_huggingface(repo_id=translator, Base_Path=base_path)
                     
             elif translator == 'damo/nlp_csanmt_translation_zh2en':
                 from modelscope.hub.snapshot_download import snapshot_download as modelscope_snapshot_download
                 base_path = os.path.join(folder_paths.models_dir, "prompt_generator", "modelscope--damo--nlp_csanmt_translation_zh2en")
                 if Auto_Download_Path and not os.path.exists(os.path.join(base_path, "tf_ckpts", "ckpt-0.data-00000-of-00001")):
-                    modelscope_snapshot_download(translator, local_dir=base_path)
+                    if os.path.exists("/stable-diffusion-cache/models/prompt_generator/nlp_csanmt_translation_zh2en"):
+                        base_path = "/stable-diffusion-cache/models/prompt_generator/nlp_csanmt_translation_zh2en"
+                    else:
+                        modelscope_snapshot_download(translator, local_dir=base_path)
                     
             # elif loader_out[3] == 'utrobinmv/t5_translate_en_ru_zh_base_200':
             elif translator == 'utrobinmv/t5_translate_en_ru_zh_base_200':
                 base_path = os.path.join(folder_paths.models_dir, "prompt_generator", "models--utrobinmv--t5_translate_en_ru_zh_base_200")
                 if Auto_Download_Path and not os.path.exists(os.path.join(base_path, "model.safetensors")):
-                    download_repoid_model_from_huggingface(translator, base_path)
+                    if os.path.exists("/stable-diffusion-cache/models/prompt_generator/t5_translate_en_ru_zh_base_200"):
+                        base_path = "/stable-diffusion-cache/models/prompt_generator/t5_translate_en_ru_zh_base_200"
+                    else:
+                        download_repoid_model_from_huggingface(translator, base_path)
                     
             # elif loader_out[3] == 'utrobinmv/t5_translate_en_ru_zh_large_1024':
             elif translator == 'utrobinmv/t5_translate_en_ru_zh_large_1024':
                 base_path = os.path.join(folder_paths.models_dir, "prompt_generator", "models--utrobinmv--t5_translate_en_ru_zh_large_1024")
                 if Auto_Download_Path and not os.path.exists(os.path.join(base_path, "model.safetensors")):
-                    download_repoid_model_from_huggingface(translator, base_path)
+                    if os.path.exists("/stable-diffusion-cache/models/prompt_generator/t5_translate_en_ru_zh_large_1024"):
+                        base_path = "/stable-diffusion-cache/models/prompt_generator/t5_translate_en_ru_zh_large_1024"
+                    else:
+                        download_repoid_model_from_huggingface(translator, base_path)
                     
         # tensor图片转换为numpy图片
         pos_image = tensor2numpy_cv2(mask)
